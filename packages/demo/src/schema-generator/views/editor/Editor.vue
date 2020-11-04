@@ -17,13 +17,14 @@
                         style="height: 100%"
                         label-position="top"
                         label-suffix="："
-                        :model="formData"
+                        :model="rootFormData"
                         label-width="80px"
                         class="genFromComponent"
                     >
                         <NestedEditor
                             :child-component-list="componentList"
                             :drag-options="dragOptions"
+                            :form-data="rootFormData"
                         >
                         </NestedEditor>
                     </el-form>
@@ -85,7 +86,7 @@
             return {
                 loading: false,
                 configTools,
-                formData: {},
+                rootFormData: {},
                 curEditorItem: null, // 选中的formItem
                 componentList: []
             };

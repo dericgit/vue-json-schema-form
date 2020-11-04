@@ -40,20 +40,23 @@
                 type: Object,
                 default: () => ({})
             },
+            formData: {
+                type: Object,
+                default: () => ({})
+            },
             childComponentList: {
                 type: Array,
                 default: () => []
             }
         },
-        data() {
-            return {
-                formData: {}
-            };
-        },
         watch: {
             childComponentList() {
                 this.computedComponentToolBarStatus();
             }
+        },
+        created() {
+
+            debugger;
         },
         methods: {
             setCurEditorItem(editorItem) {

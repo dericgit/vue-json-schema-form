@@ -90,10 +90,8 @@
                 };
 
                 // 点击其它弹窗关闭这里
-                document.addEventListener('click', this.closeHandle, false);
-                setTimeout(() => {
-                    this.$emit('showEditor', this.editorItem);
-                });
+                document.addEventListener('click', this.closeHandle, true);
+                this.$emit('showEditor', this.editorItem);
             },
             hideEditForm() {
                 this.editorItem.isEdit = false;
