@@ -1,0 +1,163 @@
+<template>
+    <draggable ref="draggable"
+               :list="childComponentList"
+               v-bind="dragOptions"
+               :class="[$style.dragArea]"
+               @change="handleDragChange"
+    >
+        <div v-for="item in childComponentList"
+             :key="item.id"
+             :slot="item.$$slot || 'default' "
+        >
+            <ViewComponentWrap
+                :form-data="formData"
+                :editor-item="item"
+                @onOperate="handleItemOperate"
+                @showEditor="handleShowEditor"
+                @hideEditor="handleHideEditor"
+            >
+            </ViewComponentWrap>
+        </div>
+    </draggable>
+</template>
+
+<script>
+    import emitter from '@/schema-generator/mixins/emitter.js';
+    import Draggable from 'vuedraggable';
+    import * as arrayMethods from '@/_common/utils/array';
+    import ViewComponentWrap from './components/ViewComponentWrap';
+    import { generateEditorItem } from './common/editorData';
+
+    export default {
+        name: 'NestedEditor',
+        components: {
+            Draggable,
+            ViewComponentWrap,
+        },
+        mixins: [emitter],
+        props: {
+            dragOptions: {
+                type: Object,
+                default: () => ({})
+            },
+            childComponentList: {
+                type: Array,
+                default: () => []
+            }
+        },
+        data() {
+            return {
+                formData: {}
+            };
+        },
+        watch: {
+            childComponentList() {
+                this.computedComponentToolBarStatus();
+            }
+        },
+        methods: {
+            setCurEditorItem(editorItem) {
+                this.dispatch('Editor', 'onSetCurEditorItem', {
+                    editorItem
+                });
+            },
+            handleShowEditor(editorItem) {
+                this.setCurEditorItem(editorItem);
+            },
+            handleHideEditor() {
+                this.setCurEditorItem(null);
+            },
+            handleDragChange(...args) {
+                console.log(args);
+            },
+            // 计算各个组件状态栏按钮状态
+            computedComponentToolBarStatus() {
+                this.childComponentList.forEach((component, componentIndex) => {
+                    Object.assign(component.toolBar, {
+                        moveUpDisabled: componentIndex === 0, // 是否可上移动
+                        moveDownDisabled: componentIndex === this.childComponentList.length - 1, // 是否可下移
+                        removeDisabled: component.additional && component.additional.unRemove // 是否可移除
+                    });
+                });
+            },
+            // 操作单个组件
+            handleItemOperate({ item, command }) {
+                const strategyMap = {
+                    moveUp(target, arrayItem) {
+                        return arrayMethods.moveUp(target, arrayItem);
+                    },
+                    moveDown(target, arrayItem) {
+                        return arrayMethods.moveDown(target, arrayItem);
+                    },
+                    copy(target, arrayItem) {
+                        // 不copy数据
+                        // eslint-disable-next-line no-unused-vars
+                        const { componentValue, ...emptyPack } = arrayItem;
+
+                        return target.splice(target.indexOf(arrayItem) + 1, 0, generateEditorItem(emptyPack));
+                    },
+                    remove(target, arrayItem) {
+                        return arrayMethods.remove(target, arrayItem);
+                    }
+                };
+
+                const curStrategy = strategyMap[command];
+
+                if (curStrategy) {
+                    curStrategy.apply(this, [this.childComponentList, item]);
+                } else {
+                    this.$message.error(`系统错误 - 未知的操作：[${command}]`);
+                }
+            },
+        }
+    };
+</script>
+
+<style module>
+    @import 'variable.css';
+
+    .dragArea {
+        background-color: #f5f5f5;
+        border: 1px dashed #bbb;
+        height: calc(100% - 44px);
+        padding: 15px;
+        overflow: auto;
+        :global {
+            .draggableToolItem {
+                width: 100%;
+                max-width: 100%;
+                &:local {
+                    &.ghost {
+                        background-color: color(var(--color-primary) a(0.4)) !important;
+                        height: 20px;
+                        padding: 10px 0;
+                        margin-bottom: 15px;
+                        &>div {
+                            width: 100%;
+                            height: 100%;
+                            background-color: var(--color-white);
+                        }
+                        p {
+                            font-size: 16px;
+                            line-height: 24px;
+                        }
+                    }
+                }
+            }
+            .emptyBox {
+                min-height: 350px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .viewEmpty_IconBox {
+                color: color(var(--checkbox-color) a(0.7));
+                font-size: 50px;
+                text-align: center;
+            }
+            .el-image {
+                vertical-align: top;
+            }
+        }
+    }
+</style>
