@@ -36,7 +36,10 @@ export function generateEditorItem(toolItem) {
             ) : toolItem.componentValue,
             property: id
         },
-        id
+        id,
+        ...(['array', 'object'].includes(currentComponentPack.viewSchema.type) ? {
+            childList: []
+        } : {})
     };
 }
 

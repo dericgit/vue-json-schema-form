@@ -36,7 +36,7 @@
                     <div v-if="curEditorItem" :class="$style.configForm">
                         <div style="padding: 20px 0;">
                             <VueJsonFrom
-                                v-model="editorValue"
+                                v-model="curEditorItem.componentValue"
                                 :schema="curEditorItem.componentPack.propsSchema"
                                 :form-props="{
                                     labelPosition: 'right',
@@ -93,18 +93,6 @@
         },
 
         computed: {
-            editorValue: {
-                get() {
-                    if (this.curEditorItem) {
-                        // 获取默认值
-                        return this.curEditorItem.componentValue;
-                    }
-                    return {};
-                },
-                set(value) {
-                    this.curEditorItem.componentValue = value;
-                }
-            },
             dragOptions() {
                 return {
                     animation: 300,

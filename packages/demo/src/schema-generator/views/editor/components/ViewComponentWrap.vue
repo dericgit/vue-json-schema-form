@@ -39,21 +39,38 @@
         </div>
         <SchemaField
             v-bind="attrs"
-        ></SchemaField>
+        >
+        </SchemaField>
+
+        <NestedEditor
+            v-if="editorItem.childList"
+            :child-component-list="editorItem.childList"
+            :drag-options="dragOptions"
+            :form-data="formData"
+        >
+        </NestedEditor>
     </div>
 </template>
 
 <script>
     import { SchemaField } from '@lljj/vue-json-schema-form';
+    import emitter from '@/schema-generator/mixins/emitter.js';
+    import NestedEditor from '../NestedEditor';
     import { editorItem2SchemaFieldProps } from '../common/editorData';
 
     export default {
         name: 'ViewComponentWrap',
         components: {
-            SchemaField
+            SchemaField,
+            NestedEditor
         },
+        mixins: [emitter],
         props: {
             editorItem: {
+                type: Object,
+                default: () => ({})
+            },
+            dragOptions: {
                 type: Object,
                 default: () => ({})
             },
@@ -91,13 +108,20 @@
 
                 // 点击其它弹窗关闭这里
                 document.addEventListener('click', this.closeHandle, true);
-                this.$emit('showEditor', this.editorItem);
+
+                this.setCurEditorItem(this.editorItem);
             },
             hideEditForm() {
                 this.editorItem.isEdit = false;
-                document.removeEventListener('click', this.closeHandle);
-                this.$emit('hideEditor', this.editorItem);
-            }
+                document.removeEventListener('click', this.closeHandle, true);
+                this.setCurEditorItem(null);
+            },
+
+            setCurEditorItem(editorItem) {
+                this.dispatch('Editor', 'onSetCurEditorItem', {
+                    editorItem
+                });
+            },
         }
     };
 </script>

@@ -7,14 +7,15 @@
     >
         <div v-for="item in childComponentList"
              :key="item.id"
-             :slot="item.$$slot || 'default' "
+             :class="{
+                 draggableItem: true,
+             }"
         >
             <ViewComponentWrap
                 :form-data="formData"
                 :editor-item="item"
+                :drag-options="dragOptions"
                 @onOperate="handleItemOperate"
-                @showEditor="handleShowEditor"
-                @hideEditor="handleHideEditor"
             >
             </ViewComponentWrap>
         </div>
@@ -22,7 +23,6 @@
 </template>
 
 <script>
-    import emitter from '@/schema-generator/mixins/emitter.js';
     import Draggable from 'vuedraggable';
     import * as arrayMethods from '@/_common/utils/array';
     import ViewComponentWrap from './components/ViewComponentWrap';
@@ -34,7 +34,6 @@
             Draggable,
             ViewComponentWrap,
         },
-        mixins: [emitter],
         props: {
             dragOptions: {
                 type: Object,
@@ -55,21 +54,8 @@
             }
         },
         created() {
-
-            debugger;
         },
         methods: {
-            setCurEditorItem(editorItem) {
-                this.dispatch('Editor', 'onSetCurEditorItem', {
-                    editorItem
-                });
-            },
-            handleShowEditor(editorItem) {
-                this.setCurEditorItem(editorItem);
-            },
-            handleHideEditor() {
-                this.setCurEditorItem(null);
-            },
             handleDragChange(...args) {
                 console.log(args);
             },
