@@ -70,7 +70,7 @@
 
     import './common/registerExtraElementComponent';
 
-    import NestedEditor from './NestedEditor';
+    import NestedEditor from './components/NestedEditor';
 
     deepFreeze(configTools);
 

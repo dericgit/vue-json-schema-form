@@ -25,8 +25,10 @@
 <script>
     import Draggable from 'vuedraggable';
     import * as arrayMethods from '@/_common/utils/array';
-    import ViewComponentWrap from './components/ViewComponentWrap';
-    import { generateEditorItem } from './common/editorData';
+    import { generateEditorItem } from '../common/editorData';
+
+    // 避免循环依赖导致undefined
+    const ViewComponentWrap = () => import('./ViewComponentWrap');
 
     export default {
         name: 'NestedEditor',
@@ -107,7 +109,6 @@
 
     .dragArea {
         background-color: #f5f5f5;
-        border: 1px dashed #bbb;
         height: calc(100% - 44px);
         padding: 15px;
         overflow: auto;

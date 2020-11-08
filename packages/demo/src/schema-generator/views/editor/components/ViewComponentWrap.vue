@@ -55,7 +55,7 @@
 <script>
     import { SchemaField } from '@lljj/vue-json-schema-form';
     import emitter from '@/schema-generator/mixins/emitter.js';
-    import NestedEditor from '../NestedEditor';
+    import NestedEditor from './NestedEditor';
     import { editorItem2SchemaFieldProps } from '../common/editorData';
 
     export default {
@@ -92,6 +92,7 @@
             handleClickView(e) {
                 // 阻止浏览器默认事件
                 e.preventDefault();
+                e.stopPropagation();
                 if (!this.editorItem.isEdit) this.showEditForm();
             },
 
@@ -134,6 +135,7 @@
         padding: 30px 10px 10px;
         cursor: move;
         outline: none;
+        border: 1px dashed #bbb;
         overflow: hidden;
         background-color: #ffffff;
         @nest :global .draggableSlot :local & {
@@ -150,13 +152,9 @@
             transition: box-shadow 0.3s ease;
             z-index: 2;
         }
-        &:hover {
-            &:after {
-                box-shadow: 0 0 2px 1px color(var(--color-primary) a(0.6)) inset, 0 1px 2px 1px color(var(--color-primary) a(0.7)) inset;
-            }
-        }
 
         &.active {
+            border: 1px dashed transparent;
             &:after {
                 box-shadow: 0 0 1px 2px var(--color-primary) inset;
             }
